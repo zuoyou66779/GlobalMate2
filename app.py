@@ -433,6 +433,48 @@ elif page=='海外市场研究':
         keywords=st.text_area('当地语言关键词'); competitors=st.text_area('竞品名称、价格、链接和卖点'); pains=st.text_area('真实用户差评与痛点'); compliance=st.text_area('合规、物流和退货注意事项'); notes=st.text_area('其他观察')
         submit=st.form_submit_button('保存市场研究记录',type='primary')
     if submit: log('海外市场研究',json.dumps({'关键词':keywords,'竞品':competitors,'用户痛点':pains,'合规物流':compliance,'其他':notes},ensure_ascii=False)); st.success('已保存到项目记录。')
+    st.markdown("---")
+    st.subheader("📊 海外市场调研概览")
+
+    research_records = [
+        item for item in st.session_state.history
+        if item.get("类型") == "海外市场研究"
+    ]
+
+    total_research = len(research_records)
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("📋 调研记录", total_research)
+    col2.metric(
+        "🌍 当前目标市场",
+        st.session_state.product.get("market") or "尚未选择"
+    )
+    col3.metric(
+        "📝 已填写调研项目",
+        sum([
+            bool(keywords.strip()),
+            bool(competitors.strip()),
+            bool(pains.strip()),
+            bool(compliance.strip()),
+            bool(notes.strip())
+        ])
+    )
+
+    filled_items = sum([
+        bool(keywords.strip()),
+        bool(competitors.strip()),
+        bool(pains.strip()),
+        bool(compliance.strip()),
+        bool(notes.strip())
+    ])
+
+    research_progress = filled_items / 5
+
+    st.progress(research_progress)
+    st.caption(
+        f"本次调研资料填写度：{research_progress:.0%}（按 5 类资料计算）"
+    )
     st.subheader('免费研究清单')
     for x in ['搜索当地语言关键词并记录联想词','比较至少 5 个竞品的售价、规格和评价','整理低分评价中重复出现的问题','核实当地标签、广告、知识产权和产品安全要求','估算采购、佣金、物流、税费和退货成本']: st.checkbox(x,key='research_'+str(abs(hash(x))))
 elif page=='出海运营计划':
@@ -446,6 +488,29 @@ elif page=='出海运营计划':
         if weeks==2 and i>3: continue
         rows.append({'阶段':phase,'计划日期':(start+timedelta(days=(i//2)*7+(i%2)*3)).isoformat(),'任务':task,'负责人':owner,'状态':'未开始'})
     df=pd.DataFrame(rows); edited=st.data_editor(df,use_container_width=True,hide_index=True,num_rows='dynamic',key='plan_editor')
+    st.subheader("📊 30 天行动计划进度")
+
+    total_tasks = len(edited)
+
+    completed_tasks = (
+        edited["状态"].astype(str).str.strip() == "已完成"
+    ).sum()
+
+    pending_tasks = total_tasks - completed_tasks
+
+    progress = (
+        completed_tasks / total_tasks
+        if total_tasks > 0 else 0
+    )
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("📋 任务总数", total_tasks)
+    col2.metric("✅ 已完成", int(completed_tasks))
+    col3.metric("⏳ 待完成", int(pending_tasks))
+
+    st.progress(progress)
+    st.caption(f"当前完成率：{progress:.0%}")
     if st.button('保存运营计划',type='primary'):
         st.session_state.plans.insert(0,{'时间':datetime.now().strftime('%Y-%m-%d %H:%M'),'产品':p.get('name',''),'市场':p.get('market',''),'任务':edited.to_dict(orient='records')}); st.session_state.plans=st.session_state.plans[:100]; persist(); log('出海运营计划',f'保存了 {len(edited)} 项任务'); st.success('计划已保存。')
     st.download_button('下载当前计划 CSV',edited.to_csv(index=False).encode('utf-8-sig'),'globalmate_plan.csv','text/csv')
