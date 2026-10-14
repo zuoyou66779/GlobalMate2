@@ -61,11 +61,72 @@ with st.sidebar:
     page=st.radio('功能导航',['工作台首页','产品信息','产品卖点分析','智能出海分析报告','多语言营销文案','海外市场研究','出海运营计划','项目记录'],label_visibility='collapsed')
     st.divider(); st.caption('不调用付费 API；数据保存在项目文件夹。')
 p=st.session_state.product
-if page=='工作台首页':
-    st.markdown('<div class="hero"><h1>🌍 GlobalMate 2.0</h1><p>产品定位、多语言内容、市场研究与运营计划，一站式整理出海工作流。</p></div>',unsafe_allow_html=True)
-    a,b,c=st.columns(3); a.metric('产品名称',p.get('name') or '尚未填写'); b.metric('目标市场',p.get('market') or '尚未选择'); c.metric('项目记录',len(st.session_state.history))
-    st.subheader('开始使用'); st.write('① 产品信息 → ② 产品卖点分析 → ③ 多语言营销文案 → ④ 海外市场研究 → ⑤ 出海运营计划')
-    st.info('本版本使用规则和模板，不联网抓取实时市场数据，也不调用付费 AI API。')
+if page == '工作台首页':
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #101d37, #244c91, #477de0);
+        padding: 34px;
+        border-radius: 22px;
+        color: white;
+        margin-bottom: 24px;
+    ">
+        <div style="font-size: 14px; opacity: 0.85;">
+            GLOBALMATE 2.0 · OVERSEAS BUSINESS ASSISTANT
+        </div>
+        <h1 style="color: white; margin-top: 14px;">
+            🌍 让出海运营更简单
+        </h1>
+        <p style="font-size: 17px; line-height: 1.8;">
+            从产品定位、多语言营销，到海外市场研究与行动计划，
+            一站式整理你的出海运营工作流。
+        </p >
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.subheader("📊 运营工作台")
+
+    a, b, c = st.columns(3)
+
+    with a:
+        st.metric(
+            "产品名称",
+            p.get('name') or '尚未填写'
+        )
+
+    with b:
+        st.metric(
+            "目标市场",
+            p.get('market') or '尚未选择'
+        )
+
+    with c:
+        st.metric(
+            "项目记录",
+            len(st.session_state.history)
+        )
+
+    st.markdown("---")
+
+    st.subheader("🚀 开始你的出海之旅")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### 📦 第一步：完善产品")
+        st.write("填写产品名称、产品特点和目标市场。")
+        st.markdown("### ✍️ 第二步：生成营销文案")
+        st.write("为不同市场准备多语言营销内容。")
+
+    with col2:
+        st.markdown("### 🔎 第三步：研究海外市场")
+        st.write("梳理目标客户、市场机会与潜在风险。")
+        st.markdown("### 🗓️ 第四步：制定行动计划")
+        st.write("生成分阶段的出海运营建议。")
+
+    st.info(
+        "💡 使用提示：建议先保存产品信息，再生成分析报告和运营计划。"
+    )
+
 elif page=='产品信息':
     st.title('📦 产品信息'); markets=['日本','美国','英国','德国','法国','加拿大','其他']; langs=['日语','英语','中文','德语','法语']; channels_all=['跨境电商平台','独立站','社交媒体','电子邮件']
     with st.form('product_form'):
